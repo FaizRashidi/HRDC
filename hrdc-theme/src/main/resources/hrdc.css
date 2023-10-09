@@ -1,0 +1,42 @@
+main #form-canvas .label {
+    display: none;
+}
+ 
+legend, main #form-canvas .form-section-title span, main #form-canvas .subform-section-title span{
+    text-transform: uppercase;
+    padding: 10px 0;
+    font-size: xx-large;
+    margin: 10px 0;
+    background: none;
+    color: #222;
+}
+ 
+body input:not([type]), body input[type=text], body input[type=password], body input[type=email], body input[type=url], body input[type=time], body input[type=date], body input[type=datetime], body input[type=datetime-local], body input[type=tel], body input[type=number], body input[type=search], body textarea, body select:not([class^=ui]), body .editor-cell input:not([type]), body .editor-cell input[type=text], body .editor-cell input[type=password], body .editor-cell input[type=email], body .editor-cell input[type=url], body .editor-cell input[type=time], body .editor-cell input[type=date], body .editor-cell input[type=datetime], body .editor-cell input[type=datetime-local], body .editor-cell input[type=tel], body .editor-cell input[type=number], body .editor-cell input[type=search], body .editor-cell textarea, body .editor-cell select:not([class^=ui]){
+    max-width: 100%;
+    width: 100%;
+}
+ 
+body #form-canvas .form-section {
+    border-radius: 15px;
+}
+ 
+#form-canvas *, #form-canvas textarea {
+    font-size: 16px;
+}
+ 
+body .form-cell, body .subform-cell {
+    padding-bottom: 10px;
+}
+ 
+.form-container{
+    padding-left: 220px;
+    background-image: url("eva-bg.jpg");
+    background-color: #f9f9f9;
+    background-position: left;
+    background-repeat: repeat-y;
+    background-clip: border-box;
+    background-size: 190px;
+    border-radius: 10px;
+    margin: 10px;
+    padding-top: 10px;
+}

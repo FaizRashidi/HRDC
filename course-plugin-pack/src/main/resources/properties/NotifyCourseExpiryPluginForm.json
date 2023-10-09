@@ -1,0 +1,52 @@
+[
+    {
+        title : 'Notify Expired Course',
+        properties : [
+            {
+                name : 'interval',
+                label : 'Interval',
+                description : 'Number',
+                type : 'TextField',
+                value : '1',
+                required : 'true',
+                regex_validation : '^[0-9]*$',
+                validation_message : 'Must be integer',
+
+            },{
+                name : 'interval_unit',
+                label : 'Week/Month/Year',
+                description : 'Week/Month/Year ',
+                type : 'SelectBox',
+                value : 'YEAR',
+                required : 'true',
+                options : [
+                    {value: 'WEEK', label : 'Week'},
+                    {value: 'MONTH', label : 'Month'},
+                    {value: 'YEAR', label : 'Year'}
+                ]
+
+            },{
+                name : 'date_of',
+                label : 'Date of',
+                description : 'Compare interval to date of what? (specific to app_fd_course_register table) eg: 1 Year after date of ?',
+                type : 'SelectBox',
+                value : 'c_date_approved',
+                required : 'true', 
+                options : [
+                    {value: 'c_date_approved', label : 'Approved Date'},
+                    {value: 'dateCreated', label : 'Date Created'},
+                    {value: 'dateModified', label : 'dateModified'}
+                ]
+            },{
+                name : 'frequency',
+                label : 'Frequency',
+                description : 'How many times to notify?',
+                type : 'TextField',
+                value : '1',
+                required : 'true',
+                regex_validation : '^[0-9]*$',
+                validation_message : 'Must be integer',
+            },
+        ],
+    }
+]
