@@ -110,7 +110,7 @@ public class CourseSchedulerNotifyCourseExpirePlugini extends DefaultApplication
                         course_name = rs.getString("c_course_name");
                         course_id = rs.getString("c_course_id");
                         notify_counter = Integer.parseInt(rs.getString("c_notify_counter") == null || rs.getString("c_notify_counter").isEmpty() ? "0" : rs.getString("c_notify_counter"));
-                        subject = "APPLICATION FOR CREATION OF EVENT BY PEMBANGUNAN SUMBER MANUSIA BERHAD (PSMB) github: "+course_name+"";
+                        subject = "APPLICATION FOR CREATION OF EVENT BY PEMBANGUNAN SUMBER MANUSIA BERHAD (PSMB): "+course_name+"";
                         msg = "<head>\n" +
                             "    <meta charset=\"UTF-8\">\n" +
                             "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" +
