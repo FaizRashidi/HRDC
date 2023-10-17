@@ -141,7 +141,7 @@ public class CourseSchedulerNotifyCourseExpirePlugini extends DefaultApplication
                             "        }\n" +
                             "        p {\n" +
                             "            color: #333;\n" +
-                            "            margin: 20pxflksdjflsdjf 0;\n" +
+                            "            margin: 20px 0;\n" +
                             "            margin-bottom: 10px; \n" +
                             "            text-align: justify;\n" +
                             "        }\n" +
