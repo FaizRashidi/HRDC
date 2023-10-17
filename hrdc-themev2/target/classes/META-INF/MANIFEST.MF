@@ -1,9 +1,11 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1696585991447
+Bnd-LastModified: 1697515964288
 Build-Jdk-Spec: 20
 Bundle-Activator: com.hrdcorp.ncs_dev.Activator
 Bundle-ClassPath: .,dependency/jsp-api-2.0.jar,dependency/servlet-api-2.
- 4.jar
+ 4.jar,dependency/swim-args-3.10.0.jar,dependency/swim-codec-3.10.0.jar,
+ dependency/swim-collections-3.10.0.jar,dependency/swim-util-3.10.0.jar,
+ dependency/json-20190722.jar
 Bundle-ManifestVersion: 2
 Bundle-Name: hrdc-themev2
 Bundle-SymbolicName: com.hrdcorp.ncs_dev.hrdc-themev2
@@ -16,7 +18,12 @@ Embed-StripGroup: true
 Embed-Transitive: true
 Embedded-Artifacts: dependency/jsp-api-2.0.jar;g="javax.servlet";a="jsp-
  api";v="2.0",dependency/servlet-api-2.4.jar;g="javax.servlet";a="servle
- t-api";v="2.4"
+ t-api";v="2.4",dependency/swim-args-3.10.0.jar;g="ai.swim";a="swim-args
+ ";v="3.10.0",dependency/swim-codec-3.10.0.jar;g="ai.swim";a="swim-codec
+ ";v="3.10.0",dependency/swim-collections-3.10.0.jar;g="ai.swim";a="swim
+ -collections";v="3.10.0",dependency/swim-util-3.10.0.jar;g="ai.swim";a=
+ "swim-util";v="3.10.0",dependency/json-20190722.jar;g="org.json";a="jso
+ n";v="20190722"
 Import-Package: org.joget.report.dao,org.joget.report.model,org.joget.re
  port.service,org.joget.commons.util,org.joget.plugin.base,org.joget.plu
  gin.property.model,org.joget.plugin.property.service,org.joget.director

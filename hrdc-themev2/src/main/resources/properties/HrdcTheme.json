@@ -30,7 +30,7 @@
         name : 'dx8colorScheme',
         label : '@@ubuilder.colorScheme@@',
         type : 'colorscheme',
-        value : '#f1f1f1;#FFFFFF;#EEF3F5;#EA5724;#2B3E6C;#2B3E6C'
+        value : '#e6e7e8;#FFFFFF;#f2f3f4;#EF5023;#223164;#223164'
     },
     {
         name : 'dx8backgroundImage',
@@ -83,13 +83,13 @@
         name : 'dx8navLinkColor',
         label : '@@ubuilder.navLinkColor@@',
         type : 'color',
-        value : '#2B3E6C'
+        value : '#223164'
     },
     {
         name : 'dx8navLinkIcon',
         label : '@@ubuilder.navLinkIcon@@',
         type : 'color',
-        value : '#2B3E6C'
+        value : '#223164'
     },
     {
         name : 'dx8navActiveLinkBackground',
@@ -101,19 +101,19 @@
         name : 'dx8navActiveLinkColor',
         label : '@@ubuilder.navActiveLinkColor@@',
         type : 'color',
-        value : '#2B3E6C'
+        value : '#223164'
     },
     {
         name : 'dx8navActiveIconColor',
         label : '@@ubuilder.navActiveIconColor@@',
         type : 'color',
-        value : '#2B3E6C'
+        value : '#223164'
     },
     {
         name : 'dx8navScrollbarThumb',
         label : '@@ubuilder.navScrollbarThumb@@',
         type : 'color',
-        value : '#2B3E6C'
+        value : '#223164'
     },
     {
         name : 'dx8navBadge',
@@ -129,7 +129,7 @@
         name : 'dx8buttonBackground',
         label : '@@ubuilder.buttonBackground@@',
         type : 'color',
-        value : '#EA5724'
+        value : '#EF5023'
     },
     {
         name : 'dx8buttonColor',
@@ -146,7 +146,7 @@
         name : 'dx8headingBgColor',
         label : '@@ubuilder.headingBgColor@@',
         type : 'color',
-        value : '#2B3E6C'
+        value : '#223164'
         
     },
     {
@@ -184,6 +184,31 @@
         name : 'dx8footerColor',
         label : '@@ubuilder.footerColor@@',
         type : 'color'
+    },
+    {
+        label : 'Status Color',
+        type : 'header'
+    },{
+        name : 'status_color',
+        label : 'Status Color',
+        type : 'color',
+        value : '#223164'
+    },
+    {
+        name : 'status_color2',
+        label : 'Status Color',
+        description: 'To set color of status in datalist based on given velue. \n eg: Approved - Green',
+        type : 'grid',
+        columns : [
+            {key : 'status', label : 'Status', required: 'true'},
+            {key : 'color', label : 'Color', required: 'true', options : [
+                {value : 'Blue', label : 'Blue'},
+                {value : 'Green', label : 'Green'},
+                {value : 'Yellow', label : 'Yellow'},
+                {value : 'Orange', label : 'Orange'},
+                {value : 'Red', label : 'Red'},            
+            ]}
+        ]
     }]
 },
 {

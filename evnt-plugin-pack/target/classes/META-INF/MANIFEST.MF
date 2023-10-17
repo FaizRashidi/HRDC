@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1695350173648
+Bnd-LastModified: 1697441999112
 Build-Jdk-Spec: 20
 Bundle-Activator: com.hrdcorp.ncs_dev.Activator
 Bundle-ClassPath: .,dependency/core-3.3.0.jar,dependency/javase-3.3.0.ja

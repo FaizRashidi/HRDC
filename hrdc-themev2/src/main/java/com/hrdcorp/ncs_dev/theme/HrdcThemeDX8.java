@@ -2,14 +2,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.hrdcorp.ncs_dev;
+package com.hrdcorp.ncs_dev.theme;
 
 import java.util.Map;
 import java.util.Set;
 import org.joget.apps.app.service.AppUtil;
-import org.joget.apps.userview.service.UserviewUtil;
 import org.joget.commons.util.ResourceBundleUtil;
-import org.joget.plugin.base.PluginManager;
 import org.joget.apps.userview.lib.AjaxUniversalTheme;
 
 /**
@@ -52,7 +50,7 @@ public class HrdcThemeDX8 extends AjaxUniversalTheme{
     @Override
     public String getJsCssLib(Map<String, Object> data) {
         String cssJs = super.getJsCssLib(data);
-
+        
         //change where needed to to inject custom css on top of the universal theme
         String bn = ResourceBundleUtil.getMessage("build.number");
         cssJs += "<link href=\"" + data.get("context_path") + "/plugin/"+getClassName()+"/hrdc.css?build=" + bn + "\" rel=\"stylesheet\" />\n";
