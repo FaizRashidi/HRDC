@@ -18,7 +18,7 @@ public class Activator implements BundleActivator {
         registrationList.add(context.registerService(CourseAuditTrailWorkflowPlugin.class.getName(), new CourseAuditTrailWorkflowPlugin(), null));
         registrationList.add(context.registerService(CourseSchedulerUpdateActiveInactivePlugin.class.getName(), new CourseSchedulerUpdateActiveInactivePlugin(), null));
         registrationList.add(context.registerService(CourseSchedulerNotifyCourseExpirePlugini.class.getName(), new CourseSchedulerNotifyCourseExpirePlugini(), null));
-
+        registrationList.add(context.registerService(CourseApiPlugin.class.getName(), new CourseApiPlugin(), null));
     }
 
     public void stop(BundleContext context) {

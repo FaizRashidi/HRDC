@@ -9,15 +9,12 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
-import net.sf.json.JSONObject;
+import org.json.JSONObject;
 import org.joget.apps.app.service.AppUtil;
 import org.joget.commons.util.LogUtil;
 import org.joget.plugin.base.DefaultPlugin;
@@ -58,13 +55,12 @@ public class CourseApiPlugin extends DefaultPlugin implements PluginWebSupport{
         // TODO Auto-generated method stub
         return "1.0";
     }
-    @Override
+    
     public void webService(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         DataSource ds = (DataSource) AppUtil.getApplicationContext().getBean("setupDataSource");
         
         try(Connection con = ds.getConnection()){
-            
             
             String method = request.getParameter("method") != null ? request.getParameter("method"): "";
             
@@ -86,16 +82,9 @@ public class CourseApiPlugin extends DefaultPlugin implements PluginWebSupport{
                     break;
             }
             
-        } catch (SQLException ex) {
-            Logger.getLogger(CourseApiPlugin.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            LogUtil.error(this.getClass().getName(), ex, "Something went wrong: ");
         }
-        
-        
-        
-        
-        
-        
-        
     }
      
     private void  getcoursedetails (HttpServletRequest request, HttpServletResponse response ,Connection con ){
