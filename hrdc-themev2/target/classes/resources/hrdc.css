@@ -283,6 +283,10 @@ body.sidebar-minimized #sidebar .nav > li > a{
     /* overflow: auto  */; 
 }
 
+.main_page {
+    padding: 1vh 1vw 1vh 8vw;
+}
+
 #content .main-body-content {
     height: calc(100% - 30px);
     overflow: auto;

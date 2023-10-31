@@ -60,16 +60,17 @@ public class CourseAuditTrailBinder extends WorkflowFormBinder {
                 String name = AppUtil.processHashVariable("#currentUser.firstName# #currentUser.lastName#", null, null, null);
                 String department = AppUtil.processHashVariable("#currentUser.department.name#", null, null, null);
                 
-                String querySubject = row.getProperty("action_query_subject")!= null ?  row.getProperty("action_query_subject") : "";
-                String queryAddEmail = row.getProperty("action_additional_email")!= null ? row.getProperty("action_additional_email") : "";
-                String queryReason = row.getProperty("action_query_reason")!= null ? row.getProperty("action_query_reason") : "";
+                // String querySubject = row.getProperty("action_query_subject")!= null ?  row.getProperty("action_query_subject") : "";
+                // String queryAddEmail = row.getProperty("action_additional_email")!= null ? row.getProperty("action_additional_email") : "";
+                // String queryReason = row.getProperty("action_query_reason")!= null ? row.getProperty("action_query_reason") : "";
+
                 String remarks = row.getProperty("action_remarks") != null ? row.getProperty("action_remarks") : ""; 
                 String action_status = row.getProperty("status");
                 String action_attachment = row.getProperty("action_attachment");
                 String action_review_status = row.getProperty("action_review_status");
                 
-                String insertSql = "INSERT INTO app_fd_course_audit (dateCreated,dateModified,c_action_date,id,createdBy,createdByName,modifiedBy,modifiedByName,c_action_workflow,c_action_activity,c_parentId,c_action_name,c_action_department,c_action_query_subject,c_action_additional_email,c_action_query_reason,c_action_remarks,c_status,c_action_attachment,c_action_review_status)"
-                        + "VALUES (NOW(),NOW(),NOW(),?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+                String insertSql = "INSERT INTO app_fd_course_audit (dateCreated,dateModified,c_action_date,id,createdBy,createdByName,modifiedBy,modifiedByName,c_action_workflow,c_action_activity,c_parentId,c_action_name,c_action_department,c_action_remarks,c_status,c_action_attachment,c_action_review_status)"
+                        + "VALUES (NOW(),NOW(),NOW(),?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
                  
                 PreparedStatement stmtInsert = con.prepareStatement(insertSql);
                 
@@ -83,13 +84,10 @@ public class CourseAuditTrailBinder extends WorkflowFormBinder {
                 stmtInsert.setString(8, parentId);
                 stmtInsert.setString(9, name);
                 stmtInsert.setString(10, department);
-                stmtInsert.setString(11, querySubject);
-                stmtInsert.setString(12, queryAddEmail);
-                stmtInsert.setString(13, queryReason);
-                stmtInsert.setString(14, remarks);
-                stmtInsert.setString(15, action_status);
-                stmtInsert.setString(16, action_attachment);
-                stmtInsert.setString(17, action_review_status);
+                stmtInsert.setString(11, remarks);
+                stmtInsert.setString(12, action_status);
+                stmtInsert.setString(13, action_attachment);
+                stmtInsert.setString(14, action_review_status);
                 
                 //Execute SQL statement
                 try{
@@ -100,7 +98,7 @@ public class CourseAuditTrailBinder extends WorkflowFormBinder {
                         workflow_path = "course_class";
                     }else if(workflowName.endsWith("License Training Material")){
                         workflow_path = "course_ltm";
-            }
+                    }
                     
                     String path = SetupManager.getBaseDirectory() + "app_formuploads/"+workflow_path+"/" + parentId+"/";
                     String newPath = SetupManager.getBaseDirectory() + "app_formuploads/course_audit/" +pId+"/";
@@ -145,7 +143,7 @@ public class CourseAuditTrailBinder extends WorkflowFormBinder {
             
         }catch(Exception ex){
             
-            LogUtil.error("Course Audit Trail ----->", ex, "Error storing using jdbc");
+            LogUtil.error("HRDC - COURSE - Audit Trail ----->", ex, "Error storing using jdbc");
             
         }finally {
             try {
@@ -153,7 +151,7 @@ public class CourseAuditTrailBinder extends WorkflowFormBinder {
                     con.close();
                 }
             } catch (Exception ex) {
-                LogUtil.error("Coursae Audit Trail ----->", ex, "Error closing the jdbc connection");
+                LogUtil.error("HRDC - COURSE - Audit Trail ----->", ex, "Error closing the jdbc connection");
             }
         } 
         

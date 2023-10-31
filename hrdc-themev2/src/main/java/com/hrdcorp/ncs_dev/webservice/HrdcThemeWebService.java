@@ -59,8 +59,12 @@ public class HrdcThemeWebService  extends DefaultPlugin implements PluginWebSupp
         return "1.0";
     }
     
+    String BASE_URL = "";
+    
     public void webService(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
          
+        BASE_URL = request.getScheme()+"://"+request.getServerName();
+
         DataSource dataSource = (DataSource) AppUtil.getApplicationContext().getBean("setupDataSource");
         
         try (Connection con = dataSource.getConnection()) {
@@ -184,9 +188,6 @@ public class HrdcThemeWebService  extends DefaultPlugin implements PluginWebSupp
                 LogUtil.error(this.getClass().getName(), ex, "Cannot close connection");
             }
         }
-    }
-
-    public static final String BASE_URL = WorkflowUtil.getHttpServletRequest().getScheme()+"://"+WorkflowUtil.getHttpServletRequest().getServerName();
-     
+    }     
 }
 

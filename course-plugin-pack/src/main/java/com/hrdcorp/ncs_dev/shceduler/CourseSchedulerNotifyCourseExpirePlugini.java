@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.hrdcorp.ncs_dev;
+package com.hrdcorp.ncs_dev.shceduler;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -19,6 +19,7 @@ import org.joget.apps.app.service.AppUtil;
 import org.joget.commons.util.LogUtil;
 import org.joget.plugin.base.DefaultApplicationPlugin;
 import org.joget.plugin.property.service.PropertyUtil;
+import com.hrdcorp.ncs_dev.util.SendEmail;
 
 /**
  *
@@ -134,7 +135,7 @@ public class CourseSchedulerNotifyCourseExpirePlugini extends DefaultApplication
                             "           width: 200px;\n" +
                             "           height: 200px;\n" +
                             "           display: none;\n" +
-                        "           }\n" +
+                            "           }\n" +
                             "        h1 {\n" +
                             "            color: #d9534f;\n" +
                             "            margin: 0 0 20px;\n" +
@@ -239,7 +240,7 @@ public class CourseSchedulerNotifyCourseExpirePlugini extends DefaultApplication
                             LogUtil.info("HRDC - COURSE - Scheduler Notify Course Expire ---->","Trying to send email to: "+"("+user_name+") - "+user_email);
                             if(notify_counter < frequency){
                                 LogUtil.info("HRDC - COURSE - Scheduler Notify Course Expire ---->","Sending reminder. Reminder number "+notify_counter+" + 1, out of "+frequency+" times.");
-                                sendEmail(user_email, "", subject, msg);
+                                SendEmail.sendEmail("Scheduler Notify Course Expire", user_email, "", subject, msg);
                                Connection con2 = ds.getConnection();
                                try{
                                     LogUtil.info("HRDC - COURSE - Scheduler Notify Course Expire ---->","Try updating notify counter");
@@ -303,32 +304,5 @@ public class CourseSchedulerNotifyCourseExpirePlugini extends DefaultApplication
 
         return null;
     }
-    
-    
-     public static void sendEmail(String user_email, String bcc, String subject, String msg) {  
-        
-        LogUtil.info("HRDC - COURSE - Scheduler Notify Course Expire ---->","Actually Sending Email to: " +user_email);
-        
-        try{
-            EmailTool et = new EmailTool();
-
-            PluginDefaultPropertiesDao dao = (PluginDefaultPropertiesDao) AppUtil.getApplicationContext().getBean("pluginDefaultPropertiesDao");
-            PluginDefaultProperties pluginDefaultProperties = dao.loadById("org.joget.apps.app.lib.EmailTool", AppUtil.getCurrentAppDefinition());
-            Map properties = PropertyUtil.getPropertiesValueFromJson(pluginDefaultProperties.getPluginProperties());
-
-            properties.put("from", "no-reply@your-company-name.com");
-            properties.put("toSpecific", user_email);
-            properties.put("bcc", "bcc");
-            properties.put("subject", subject);
-            properties.put("message", msg);
-            properties.put("isHtml", "true");
-
-            et.execute(properties);
-        }catch(Exception ex){
-            LogUtil.error("HRDC - COURSE - Scheduler Notify Course Expire ---->", ex, "Error sending email");
-        }
-        
-        LogUtil.info("HRDC - COURSE - Scheduler Notify Course Expire ---->","email successfully sent to participant" + user_email);      
-    }   
     
 }

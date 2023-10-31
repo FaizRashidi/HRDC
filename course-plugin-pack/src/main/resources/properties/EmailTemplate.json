@@ -1,0 +1,54 @@
+[{
+    title : 'Email-Template Mapper Tool',
+    properties : [{
+        name:'from',
+        label:'From',
+        type:'textfield'
+    },{
+        name:'to',
+        label:'To (Specific email address)',
+        type:'textfield'
+    },{
+        name:'to_pt_id',
+        label:'To (Participant ID)',
+        type:'textfield'
+    },{
+        name:'cc',
+        label:'CC (Specific email address)',
+        type:'textfield'
+    },{
+        name:'cc_pt_id',
+        label:'CC (Participant ID)',
+        type:'textfield'
+    },{
+        name:'app_type',
+        label: 'App Type',
+        type:'radio',
+        required : 'true',
+        value : 'course_register',
+        options : [
+            {value: 'course_register', label : 'Course Register'},
+            {value: 'course_amendment', label : 'Course Amendment'},
+            {value: 'class_creation', label : 'Class Creation'},
+            {value: 'class_amendment', label : 'Class Amendment'},
+            {value: 'class_cancellation', label : 'Class Cancellation'},                
+            {value: 'license_training_material', label : 'License Training Material'}   
+        ]
+    },{
+        name:'non_template_setup',
+        label: 'Non Template Setup',
+        type: 'radio',
+        required: 'true',
+        value : 'false',
+        options : [
+            {value: 'true', label : 'Yes'},
+            {value: 'false', label : 'No'}            
+        ]
+    },{
+        name:'mail_template',
+        label: 'Email Template',
+        type:'selectbox',
+        options_ajax : '[CONTEXT_PATH]/web/json/app[APP_PATH]/plugin/com.hrdcorp.ncs_dev.webservice.CourseApiPlugin/service?method=GETTEMPLATE',
+        required : 'true'
+    }]
+}]

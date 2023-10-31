@@ -1,10 +1,17 @@
 package com.hrdcorp.ncs_dev;
 
+import com.hrdcorp.ncs_dev.shceduler.CourseSchedulerNotifyCourseExpirePlugini;
+import com.hrdcorp.ncs_dev.shceduler.CourseSchedulerUpdateActiveInactivePlugin;
+import com.hrdcorp.ncs_dev.shceduler.CourseShedulerQueryReminder;
+import com.hrdcorp.ncs_dev.webservice.CourseApiPlugin;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
+
+
 
 public class Activator implements BundleActivator {
 
@@ -19,6 +26,11 @@ public class Activator implements BundleActivator {
         registrationList.add(context.registerService(CourseSchedulerUpdateActiveInactivePlugin.class.getName(), new CourseSchedulerUpdateActiveInactivePlugin(), null));
         registrationList.add(context.registerService(CourseSchedulerNotifyCourseExpirePlugini.class.getName(), new CourseSchedulerNotifyCourseExpirePlugini(), null));
         registrationList.add(context.registerService(CourseApiPlugin.class.getName(), new CourseApiPlugin(), null));
+        registrationList.add(context.registerService(CourseShedulerQueryReminder.class.getName(), new CourseShedulerQueryReminder(), null));
+        registrationList.add(context.registerService(CourseEmailTemplate.class.getName(), new CourseEmailTemplate(), null));
+        registrationList.add(context.registerService(CourseSaveEmailTemplateBinder.class.getName(), new CourseSaveEmailTemplateBinder(), null));
+        // registrationList.add(context.registerService(CourseLoadEmailTemplateBinder.class.getName(), new CourseLoadEmailTemplateBinder(), null));
+
     }
 
     public void stop(BundleContext context) {

@@ -1,0 +1,58 @@
+[
+    {
+        title : 'Notify Course Based on Status',
+        properties : [
+            {
+                name : 'action_review_status',
+                label : 'Status',
+                description : 'Send notification based on course Review Status of?',
+                type : 'SelectBox',
+                value : 'Queried',
+                required : 'true',
+                options : [
+                    {value: 'Submitted', label : 'Submitted'},
+                    {value: 'Approved', label : 'Approved'},
+                    {value: 'Rejected', label : 'Rejected'},
+                    {value: 'Queried', label : 'Queried'},
+                    {value: 'Query Replied', label : 'Query Replied'},
+                    {value: 'Sent to Committee', label : 'Sent to Committee'},
+                    {value: 'Forwarded', label : 'Forwarded'}
+                ]
+
+            },{
+                name : 'interval',
+                label : 'Exceeds',
+                description : 'Number - Notification will be sent when selected Status not changing for how long?',
+                type : 'TextField',
+                value : '1',
+                required : 'true',
+                regex_validation : '^[0-9]*$',
+                validation_message : 'Must be integer'
+
+            },{
+                name : 'interval_unit',
+                label : 'Week/Month/Year',
+                description : 'Day/Week/Month/Year - Notification will be sent when it passes day/week/month/year?',
+                type : 'SelectBox',
+                value : 'YEAR',
+                required : 'true',
+                options : [
+                    {value: 'DAY', label : 'Day'},
+                    {value: 'WEEK', label : 'Week'},
+                    {value: 'MONTH', label : 'Month'},
+                    {value: 'YEAR', label : 'Year'}
+                ]
+
+            },{
+                name : 'max_reminder',
+                label : 'Maximum Amount',
+                description : 'How many times to notify before it auto reject/close?',
+                type : 'TextField',
+                value : '1',
+                required : 'true',
+                regex_validation : '^[0-9]*$',
+                validation_message : 'Must be integer'
+            },
+        ],
+    }
+]
