@@ -44,10 +44,10 @@ public class AuditTrail {
                 String activityName = rs.getString("c_action_activity");
                 String workflowName = rs.getString("c_action_workflow");
 
-                String username, name, department, remarks, action_status, action_attachment, action_review_status;
+                String username, name, department, remarks, action_status, action_attachment, action_review_status, amend_reason;
 
                 if (update_type == "autoreject"){
-                    LogUtil.info("HRDC - COURSE - "+plugin_name+" ---->","Adding Auto Reject Audit Trail");
+                    // LogUtil.info("HRDC - COURSE - "+plugin_name+" ---->","Adding Auto Reject Audit Trail");
 
                     username = "System";
                     name = "System";
@@ -57,8 +57,10 @@ public class AuditTrail {
                     action_status = "Rejected";
                     action_attachment = rs.getString("c_action_attachment");
                     action_review_status = "Rejected";
+
+                    amend_reason = rs.getString("c_action_amend_reason");
                 }else{
-                    LogUtil.info("HRDC - COURSE - "+plugin_name+" ---->","Adding Audit Trail");
+                    // LogUtil.info("HRDC - COURSE - "+plugin_name+" ---->","Adding Audit Trail");
 
                     username = rs.getString("c_action_username");
                     name = rs.getString("c_action_name");
@@ -68,11 +70,13 @@ public class AuditTrail {
                     action_status = rs.getString("c_status");
                     action_attachment = rs.getString("c_action_attachment");
                     action_review_status = rs.getString("c_action_review_status");
+
+                    amend_reason = rs.getString("c_action_amend_reason");
                 }
                 
                 
-                String insertSql = "INSERT INTO app_fd_course_audit (dateCreated,dateModified,c_action_date,id,createdBy,createdByName,modifiedBy,modifiedByName,c_action_workflow,c_action_activity,c_parentId,c_action_name,c_action_department,c_action_remarks,c_status,c_action_attachment,c_action_review_status)"
-                        + "VALUES (NOW(),NOW(),NOW(),?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+                String insertSql = "INSERT INTO app_fd_course_audit (dateCreated,dateModified,c_action_date,id,createdBy,createdByName,modifiedBy,modifiedByName,c_action_workflow,c_action_activity,c_parentId,c_action_name,c_action_department,c_action_remarks,c_status,c_action_attachment,c_action_review_status, c_action_amend_reason)"
+                        + "VALUES (NOW(),NOW(),NOW(),?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
 
                 PreparedStatement stmtInsert = con.prepareStatement(insertSql);
 
@@ -90,57 +94,62 @@ public class AuditTrail {
                 stmtInsert.setString(12, action_status);
                 stmtInsert.setString(13, action_attachment);
                 stmtInsert.setString(14, action_review_status);
+                stmtInsert.setString(15, amend_reason);
 
                 LogUtil.info("HRDC - COURSE - "+plugin_name+" ---->","audit Trail Executing");
                 stmtInsert.executeUpdate();
 
-                try{
-                    String workflow_path = null;
-                    if (workflowName.endsWith("Course Registration") || workflowName.endsWith("Course Amendment")){
-                        workflow_path = "course_register";
-                    }else if(workflowName.endsWith("Class Creation") || workflowName.endsWith("Class Amendment") || workflowName.endsWith("Class Cancellation")){
-                        workflow_path = "course_class";
-                    }else if(workflowName.endsWith("License Training Material")){
-                        workflow_path = "course_ltm";
+                if(action_attachment != null){
+                    LogUtil.info("HRDC - COURSE - "+plugin_name+" ---->","Attachment exist");
+                    try{
+                        LogUtil.info("HRDC - COURSE - "+plugin_name+" ---->", "Copy file to audit trail");
+                        String workflow_path = null;
+                        if (workflowName.endsWith("Course Registration") || workflowName.endsWith("Course Amendment")){
+                            workflow_path = "course_register";
+                        }else if(workflowName.endsWith("Class Creation") || workflowName.endsWith("Class Amendment") || workflowName.endsWith("Class Cancellation")){
+                            workflow_path = "course_class";
+                        }else if(workflowName.endsWith("License Training Material")){
+                            workflow_path = "course_ltm";
+                        }
+                        
+                        String path = SetupManager.getBaseDirectory() + "app_formuploads/"+workflow_path+"/" + parentId+"/";
+                        String newPath = SetupManager.getBaseDirectory() + "app_formuploads/course_audit/" +pId+"/";
+                        
+                        LogUtil.info("HRDC - COURSE - "+plugin_name+" ---->","Checking if path exist: " + path);                    
+                        
+                        Path sourcePath = Paths.get(path, action_attachment);
+                        Path destinationPath = Paths.get(newPath, action_attachment);
+                        
+                        
+                        if (Files.exists(sourcePath)) {
+                            LogUtil.info("HRDC - COURSE - "+plugin_name+" ---->","Source path exist:" + path);      
+                            if (!Files.exists(destinationPath.getParent())) {
+                                LogUtil.info("HRDC - COURSE - "+plugin_name+" ---->","Destination path not exist, Creating Folder"+ destinationPath);
+                                
+                                Files.createDirectories(destinationPath.getParent());
+                            }
+                                                    
+                            try {
+                                LogUtil.info("HRDC - COURSE - "+plugin_name+" ---->","Copying File");
+                                Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+                                LogUtil.info("HRDC - COURSE - "+plugin_name+" ---->","Copy Successful");
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                LogUtil.info("HRDC - COURSE - "+plugin_name+" ---->","Error copy");
+                            }
+                        }else{
+                            LogUtil.info("HRDC - COURSE - "+plugin_name+" ---->","Source path doesn't exist:" + path); 
+                            if (!Files.exists(destinationPath.getParent())) {
+                                LogUtil.info("HRDC - COURSE - "+plugin_name+" ---->","Path not exist, Creating Folder"+ destinationPath);
+                                
+                                Files.createDirectories(destinationPath.getParent());
+                            }
+                        }
+                        
+                        
+                    }catch (Exception ex){
+                        LogUtil.error("HRDC - COURSE - "+plugin_name+" ---->", ex, "Error copying file to Audit trail from/table");
                     }
-                    
-                    String path = SetupManager.getBaseDirectory() + "app_formuploads/"+workflow_path+"/" + parentId+"/";
-                    String newPath = SetupManager.getBaseDirectory() + "app_formuploads/course_audit/" +pId+"/";
-                    
-                    LogUtil.info("HRDC - COURSE - "+plugin_name+" ---->","Checking if path exist: " + path);                    
-                    
-                    Path sourcePath = Paths.get(path, action_attachment);
-                    Path destinationPath = Paths.get(newPath, action_attachment);
-                    
-                    
-                    if (Files.exists(sourcePath)) {
-                        LogUtil.info("HRDC - COURSE - "+plugin_name+" ---->","Source path exist:" + path);      
-                        if (!Files.exists(destinationPath.getParent())) {
-                            LogUtil.info("HRDC - COURSE - "+plugin_name+" ---->","Destination path not exist, Creating Folder"+ destinationPath);
-                            
-                            Files.createDirectories(destinationPath.getParent());
-                        }
-                                                
-                        try {
-                            LogUtil.info("HRDC - COURSE - "+plugin_name+" ---->","Copying File");
-                            Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
-                            LogUtil.info("HRDC - COURSE - "+plugin_name+" ---->","Copy Successful");
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            LogUtil.info("HRDC - COURSE - "+plugin_name+" ---->","Error copy");
-                        }
-                    }else{
-                        LogUtil.info("HRDC - COURSE - "+plugin_name+" ---->","Source path doesn't exist:" + path); 
-                        if (!Files.exists(destinationPath.getParent())) {
-                            LogUtil.info("HRDC - COURSE - "+plugin_name+" ---->","Path not exist, Creating Folder"+ destinationPath);
-                            
-                            Files.createDirectories(destinationPath.getParent());
-                        }
-                    }
-                    
-                    
-                }catch (Exception ex){
-                    LogUtil.error("HRDC - COURSE - "+plugin_name+" ---->", ex, "Error copying file to Audit trail from/table");
                 }
             }
         }catch (Exception ex){

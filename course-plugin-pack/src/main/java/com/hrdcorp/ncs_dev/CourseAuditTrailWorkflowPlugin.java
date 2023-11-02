@@ -74,8 +74,8 @@ public class CourseAuditTrailWorkflowPlugin extends DefaultApplicationPlugin{
         String processId = wfAssignment.getProcessId();
         
         LogUtil.info("HRDC - COURSE - Audit Trail Workflow Plugin ---->","Record ID = " + id);
-        LogUtil.info("HRDC - COURSE - Audit Trail Workflow Plugin ---->","Process ID = " + processId);
-        LogUtil.info("HRDC - COURSE - Audit Trail Workflow Plugin ---->","Status = " + status);
+        // LogUtil.info("HRDC - COURSE - Audit Trail Workflow Plugin ---->","Process ID = " + processId);
+        // LogUtil.info("HRDC - COURSE - Audit Trail Workflow Plugin ---->","Status = " + status);
         
         DataSource ds = (DataSource) AppUtil.getApplicationContext().getBean("setupDataSource");
         

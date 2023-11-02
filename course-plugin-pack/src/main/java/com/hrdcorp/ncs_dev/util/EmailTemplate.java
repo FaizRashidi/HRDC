@@ -40,8 +40,8 @@ public class EmailTemplate {
             String template_name = rs.getString("template_name");
             String c_template_subject = rs.getString("c_template_subject");
             String c_template_content = rs.getString("c_template_content");
-            LogUtil.info("HRDC - COURSE - Email Template Util ---->","Template Subject: " + c_template_subject);
-            LogUtil.info("HRDC - COURSE - Email Template Util ---->","Template Content: ...");
+            // LogUtil.info("HRDC - COURSE - Email Template Util ---->","Template Subject: " + c_template_subject);
+            // LogUtil.info("HRDC - COURSE - Email Template Util ---->","Template Content: ...");
 
             result.put("id",id);
             result.put("template_name", template_name);
@@ -67,8 +67,8 @@ public class EmailTemplate {
             String c_additional_email = rs.getString("c_additional_email");
             String c_template_subject = rs.getString("c_template_subject");
             String c_template_content = rs.getString("c_template_content");
-            LogUtil.info("HRDC - COURSE - Email Template Util ---->","Template Subject from user: " + c_template_subject);
-            LogUtil.info("HRDC - COURSE - Email Template Util ---->","Template additional emailr: " +c_additional_email);
+            // LogUtil.info("HRDC - COURSE - Email Template Util ---->","Template Subject from user: " + c_template_subject);
+            // LogUtil.info("HRDC - COURSE - Email Template Util ---->","Template additional emailr: " +c_additional_email);
 
             result.put("parentId", parentId);
             result.put("c_additional_email", c_additional_email);
@@ -82,7 +82,7 @@ public class EmailTemplate {
     public static String buildContent (String app, String id, String msg, Connection con) throws SQLException{
         String tableName = "";
 
-        LogUtil.info("HRDC - COURSE - Email Template Util ---->","Building Content");
+        LogUtil.info("HRDC - COURSE - Email Template Util ---->","Building string");
         // LogUtil.info("HRDC - COURSE - Email Template Util ---->","app: "+app);
         // LogUtil.info("HRDC - COURSE - Email Template Util ---->","id: " +id);
 
@@ -94,8 +94,8 @@ public class EmailTemplate {
             tableName = "app_fd_course_ltm";
         }
 
-        LogUtil.info("HRDC - COURSE - Email Template Util ---->","tableName: " + tableName);
-        LogUtil.info("HRDC - COURSE - Email Template Util ---->","Email Content: " + msg);
+        // LogUtil.info("HRDC - COURSE - Email Template Util ---->","tableName: " + tableName);
+        // LogUtil.info("HRDC - COURSE - Email Template Util ---->","Email Content: ...");
 
         Pattern pattern = Pattern.compile("\\[[^\\]]+\\]");
         Matcher matcher = pattern.matcher(msg);
@@ -105,7 +105,17 @@ public class EmailTemplate {
             String columnName = matcher.group().replace("[", "").replace("]", ""); // Get the column name inside the brackets
 
             // Fetch the value from the database for the specific column
-            String value = fetchValueFromDatabase(columnName, tableName, id, con);
+
+            String value = "";
+            if(columnName.contains("LINK")){
+                value =  fetchLinkFromDatabase(columnName, tableName,id, con);
+            }else if(columnName.contains("c_motto")){
+                value = fetchMottoFromDatabase(columnName, tableName, id, con);
+            }else if(columnName.contains("dateCurrent") || columnName.contains("date_of_letter")){
+                value = getDate();
+            }else{
+                value = fetchValueFromDatabase(columnName, tableName, id, con);
+            }
             // LogUtil.info("HRDC - COURSE - Email Template Util ---->",columnName+": "+value);
 
             // Replace the placeholder with the actual value
@@ -115,60 +125,122 @@ public class EmailTemplate {
         return msg;
     }
 
-    private static String fetchValueFromDatabase(String columnName, String tableName, String recordId, Connection con) {
+    private static String fetchValueFromDatabase(String columnName, String tableName, String id, Connection con) {
         String value = "";
         String query = "";
-
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy");  
-        LocalDateTime now = LocalDateTime.now();  
         
-        String current_year = dtf.format(now);
-
-        if(columnName.equals("c_motto")){
-            query = "SELECT * FROM app_fd_empm_stp_mail_motto "
-                    + "WHERE curdate() between STR_TO_DATE(concat(c_time_start,'-"+current_year+"'), '%d-%b-%Y') and " 
-                    + "STR_TO_DATE(concat(c_time_end,'-"+current_year+"'), '%d-%b-%Y')";
-        }else if(columnName.contains("LINK")){
-            
-
-
-        }else{
-            query = "SELECT " + columnName + " FROM " + tableName + " WHERE id=?";
-            // LogUtil.info("HRDC - COURSE - Email Template Util ---->","query: " +query);
-        }
+        query = "SELECT "+columnName+" FROM "+tableName+" WHERE id=?";
         
         try (PreparedStatement stmt = con.prepareStatement(query)) {
-            stmt.setString(1, recordId);
+
+            stmt.setString(1, id);
             ResultSet rs = stmt.executeQuery();
+
             if (rs.next()) {
                 if(rs.getString(columnName) == null || rs.getString(columnName).isEmpty()){
                     value = "";
                 }else if(columnName.contains("dateCreated")||columnName.contains("dateModified")||columnName.contains("date")){
                     value = convertDateFormat(rs.getString(columnName));
-                }else if(columnName.contains("LINK")){
-                    String baseUrl = WorkflowUtil.getHttpServletRequest().getScheme()+"://"+WorkflowUtil.getHttpServletRequest().getServerName();;
-                    String html_link = "<a href='";
-                    String key = "", isInbox = "";
-                    String[] splitField = columnName.split("\\{");
-                    String link_type = splitField[0];
-                    String secParam = splitField.length>1? splitField[1].replace("}", "") :"";
-
-                    key = rs.getString("c_link")==null?"":rs.getString("c_link").toString();
-                    isInbox = rs.getString("c_is_inbox")==null?"":rs.getString("c_is_inbox").toString();
-                    
-                    value = html_link+baseUrl+key+"?id="+recordId+ "'>" + secParam + "</a>";
-                }
-                else {
+                }else {
                     value = rs.getString(columnName);
                 }
+                // LogUtil.info("HRDC - COURSE - Email Template Util ---->",columnName+": " + value);
             }
         } catch (SQLException e) {
             LogUtil.error("HRDC - COURSE - Email Template Util ---->",e,"Fail to get column "+columnName+": " + value);
         }
         return value;
     }
+   
+    private static String fetchLinkFromDatabase (String columnName, String tableName, String id, Connection con){
+        String value= "", query = "";
+
+        query = "SELECT * FROM app_fd_stp_links WHERE c_keyword =?";
+        
+
+        try (PreparedStatement stmt = con.prepareStatement(query)) {
+            String[] splitField = columnName.split("\\{");
+            String link_type = splitField[0];
+            String secParam = splitField.length>1? splitField[1].replace("}", "") :"";
+            // LogUtil.info("HRDC - COURSE - Email Template Util ---->","columnName: " + columnName);
+            // LogUtil.info("HRDC - COURSE - Email Template Util ---->","splitField: " + splitField);
+            // LogUtil.info("HRDC - COURSE - Email Template Util ---->","link_type: " + value);
+            // LogUtil.info("HRDC - COURSE - Email Template Util ---->","secParam: " + secParam);
+            stmt.setString(1, link_type);
+            ResultSet rs = stmt.executeQuery();
+
+            if(rs.next()){
+                
+                String baseUrl = WorkflowUtil.getHttpServletRequest().getScheme()+"://"+WorkflowUtil.getHttpServletRequest().getServerName()+"/jw/web/userview/course_registration_module/course/_/";
+                String html_link = "<a href='";
+                String key = "", isInbox = "", url="";
+
+                key = rs.getString("c_link")==null?"":rs.getString("c_link").toString();
+                isInbox = rs.getString("c_is_inbox")==null?"":rs.getString("c_is_inbox").toString();
+                
+                if(!isInbox.isEmpty()){
+                    url = baseUrl+key;
+                }else{
+                    url = baseUrl+key+"?id="+id;
+                }
+
+                value = html_link+url+ "'>" + secParam + "</a>";
+            }
+
+        }catch(Exception ex){
+            LogUtil.error("HRDC - COURSE - Email Template Util ---->",ex,"Fail to Link "+columnName+": ");
+        }
+
+        return value;
+    }
+
+    private static String fetchMottoFromDatabase (String columnName, String tableName, String id, Connection con){
+        String value= "", query = "";
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy");  
+        LocalDateTime now = LocalDateTime.now();  
+        
+        String current_year = dtf.format(now);
+        query = "SELECT * FROM app_fd_empm_stp_mail_motto "
+                + "WHERE curdate() between STR_TO_DATE(concat(c_time_start,'-"+current_year+"'), '%d-%b-%Y') and " 
+                + "STR_TO_DATE(concat(c_time_end,'-"+current_year+"'), '%d-%b-%Y')";;
+        
+        try (PreparedStatement stmt = con.prepareStatement(query)) {
+            
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                value = rs.getString(columnName);
+
+                LogUtil.info("HRDC - COURSE - Email Template Util ---->",columnName+": " + value);
+            }
+        } catch (SQLException e) {
+            LogUtil.error("HRDC - COURSE - Email Template Util ---->",e,"Fail to get column "+columnName+": " + value);
+        }
+
+        return value;
+    }
+
+    private static String getDate() {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");  
+        LocalDateTime now = LocalDateTime.now();  
+        
+        return dtf.format(now);
+    }
+
+    public static String convertDateFormat(String inputDate) {
+        SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        SimpleDateFormat outputDateFormat = new SimpleDateFormat("dd/MM/yyyy");
     
-    public static String emailContentHeader(String subject){
+        try {
+            Date date = inputDateFormat.parse(inputDate);
+            return outputDateFormat.format(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null; // Return null in case of an error
+        }
+    }
+
+     public static String emailContentHeader(String subject){
         String header ="";
 
         header= "<head>\r\n" +
@@ -229,19 +301,6 @@ public class EmailTemplate {
                 "    </div>\r\n" +
                 "</body>";
         return footer;
-    }
-
-    public static String convertDateFormat(String inputDate) {
-        SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-        SimpleDateFormat outputDateFormat = new SimpleDateFormat("dd/MM/yy");
-    
-        try {
-            Date date = inputDateFormat.parse(inputDate);
-            return outputDateFormat.format(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return null; // Return null in case of an error
-        }
     }
 
 }

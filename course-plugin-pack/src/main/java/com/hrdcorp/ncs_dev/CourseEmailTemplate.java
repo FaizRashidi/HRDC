@@ -164,8 +164,8 @@ public class CourseEmailTemplate extends DefaultApplicationPlugin{
                 newMsg = EmailTemplate.emailContentHeader(newSubject) + EmailTemplate.buildContent(app_type, id, msg, con) + EmailTemplate.emailContentFooter();
             }
             
-            LogUtil.info("HRDC - COURSE - Email Template Mapper Plugin ---->","Receiver: " + receiver);
-            SendEmail.sendEmail("Scheduler Notify Query Reminder", receiver, "", newSubject, newMsg);
+            // LogUtil.info("HRDC - COURSE - Email Template Mapper Plugin ---->","Receiver: " + receiver);
+            SendEmail.sendEmail("Email Template Mapper Plugin", receiver, "", newSubject, newMsg);
 
             
         } catch (Exception ex) {

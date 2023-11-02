@@ -68,9 +68,10 @@ public class CourseAuditTrailBinder extends WorkflowFormBinder {
                 String action_status = row.getProperty("status");
                 String action_attachment = row.getProperty("action_attachment");
                 String action_review_status = row.getProperty("action_review_status");
+                String amend_reason = row.getProperty("action_amend_reason");
                 
-                String insertSql = "INSERT INTO app_fd_course_audit (dateCreated,dateModified,c_action_date,id,createdBy,createdByName,modifiedBy,modifiedByName,c_action_workflow,c_action_activity,c_parentId,c_action_name,c_action_department,c_action_remarks,c_status,c_action_attachment,c_action_review_status)"
-                        + "VALUES (NOW(),NOW(),NOW(),?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+                String insertSql = "INSERT INTO app_fd_course_audit (dateCreated,dateModified,c_action_date,id,createdBy,createdByName,modifiedBy,modifiedByName,c_action_workflow,c_action_activity,c_parentId,c_action_name,c_action_department,c_action_remarks,c_status,c_action_attachment,c_action_review_status, c_action_amend_reason)"
+                        + "VALUES (NOW(),NOW(),NOW(),?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
                  
                 PreparedStatement stmtInsert = con.prepareStatement(insertSql);
                 
@@ -88,6 +89,7 @@ public class CourseAuditTrailBinder extends WorkflowFormBinder {
                 stmtInsert.setString(12, action_status);
                 stmtInsert.setString(13, action_attachment);
                 stmtInsert.setString(14, action_review_status);
+                stmtInsert.setString(15, amend_reason);
                 
                 //Execute SQL statement
                 try{

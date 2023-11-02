@@ -79,6 +79,9 @@ public class CourseApiPlugin extends DefaultPlugin implements PluginWebSupport{
                 case "GETKEYWORDNAME":
                     getKeywordName(request, response, con);
                     break;
+                case "GETLINKSNAME":
+                    getLinksName(request, response, con);
+                    break;
                 default:
                     response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, "Parameter method with invalid option " + method);
                     LogUtil.info(this.getClass().getName(), "Parameter method with invalid option");
@@ -184,6 +187,35 @@ public class CourseApiPlugin extends DefaultPlugin implements PluginWebSupport{
             con.close();
         }
     }
+
+    private void getLinksName (HttpServletRequest request, HttpServletResponse response ,Connection con ) throws SQLException{
+        
+        String sql = "SELECT c_keyword, c_link FROM app_fd_stp_links";
+        
+        try (PrintWriter out = response.getWriter()) {
+            PreparedStatement stmt = con.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+            JSONArray array = new JSONArray();
+            while (rs.next()) {
+                JSONObject obj = new JSONObject();
+                String keyword = rs.getString("c_keyword");
+                String link = rs.getString("c_link");
+                obj.put("pholder", keyword);
+                obj.put("descr", link);
+                array.put(obj);
+            }
+
+            out.print(array);
+            
+
+        } catch (Exception e) {
+            LogUtil.error(this.getClass().getName(), e, "Something went wrong:");
+            
+        }finally{
+            con.close();
+        }
+    }
+
 }
 
 
