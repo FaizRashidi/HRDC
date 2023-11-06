@@ -88,10 +88,12 @@ public class CourseSaveEmailTemplateBinder extends WorkflowFormBinder {
             UuidGenerator uuid = UuidGenerator.getInstance();
             String pId = uuid.getUuid();
 
-            
+            if(rawValue.length < 3){
+                return rows;
+            }
             String templateId = rawValue[0]==null?"":rawValue[0];
-            String appType = rawValue[0]==null?"":rawValue[1];
-            String parentId = rawValue[1]==null?"":rawValue[2];
+            String appType = rawValue[1]==null?"":rawValue[1];
+            String parentId = rawValue[2]==null?"":rawValue[2];
 
             // Map<String, String> template = EmailTemplate.getTemplate(templateId, con);
 

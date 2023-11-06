@@ -144,10 +144,12 @@ public class EmailTemplate {
                 }else {
                     value = rs.getString(columnName);
                 }
-                // LogUtil.info("HRDC - COURSE - Email Template Util ---->",columnName+": " + value);
+                LogUtil.info("HRDC - COURSE - Email Template Util ---->",columnName+": " + value);
             }
         } catch (SQLException e) {
             LogUtil.error("HRDC - COURSE - Email Template Util ---->",e,"Fail to get column "+columnName+": " + value);
+            value = "";
+            return value;
         }
         return value;
     }
@@ -189,6 +191,8 @@ public class EmailTemplate {
 
         }catch(Exception ex){
             LogUtil.error("HRDC - COURSE - Email Template Util ---->",ex,"Fail to Link "+columnName+": ");
+            value = "";
+            return value;
         }
 
         return value;
@@ -215,6 +219,8 @@ public class EmailTemplate {
             }
         } catch (SQLException e) {
             LogUtil.error("HRDC - COURSE - Email Template Util ---->",e,"Fail to get column "+columnName+": " + value);
+            value = "";
+            return value;
         }
 
         return value;
@@ -228,7 +234,13 @@ public class EmailTemplate {
     }
 
     public static String convertDateFormat(String inputDate) {
-        SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        LogUtil.info("HRDC - COURSE - Email Template Util ---->","date: " + inputDate);
+        SimpleDateFormat inputDateFormat;
+        if (inputDate.contains(".")){
+            inputDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        }else{
+            inputDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        }
         SimpleDateFormat outputDateFormat = new SimpleDateFormat("dd/MM/yyyy");
     
         try {
@@ -240,7 +252,7 @@ public class EmailTemplate {
         }
     }
 
-     public static String emailContentHeader(String subject){
+    public static String emailContentHeader(String subject){
         String header ="";
 
         header= "<head>\r\n" +
