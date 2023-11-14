@@ -144,7 +144,7 @@ public class EmailTemplate {
                 }else {
                     value = rs.getString(columnName);
                 }
-                LogUtil.info("HRDC - COURSE - Email Template Util ---->",columnName+": " + value);
+                // LogUtil.info("HRDC - COURSE - Email Template Util ---->",columnName+": " + value);
             }
         } catch (SQLException e) {
             LogUtil.error("HRDC - COURSE - Email Template Util ---->",e,"Fail to get column "+columnName+": " + value);

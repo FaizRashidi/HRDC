@@ -48,7 +48,7 @@
         name:'mail_template',
         label: 'Email Template',
         type:'selectbox',
-        options_ajax : '[CONTEXT_PATH]/web/json/app[APP_PATH]/plugin/com.hrdcorp.ncs_dev.webservice.CourseApiPlugin/service?method=GETTEMPLATE',
+        options_ajax : '[CONTEXT_PATH]/web/json/app[APP_PATH]/plugin/com.hrdcorp.ncs_dev.webservice.CourseApi/service?method=GETTEMPLATE',
         required : 'true'
     }]
 }]
