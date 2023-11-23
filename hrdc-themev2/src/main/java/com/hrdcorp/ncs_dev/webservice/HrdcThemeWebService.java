@@ -153,7 +153,7 @@ public class HrdcThemeWebService  extends DefaultPlugin implements PluginWebSupp
     private void appIcon(HttpServletRequest request, HttpServletResponse response, Connection con) {
 
         String sql = "SELECT login.id, login.c_parentId, login.c_image, theme.c_duration FROM app_fd_stp_loginCarousel login LEFT JOIN app_fd_stp_theme theme ON login.c_parentId = theme.id";
-
+        
         try (PrintWriter out = response.getWriter()) {
             PreparedStatement stmt = con.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();

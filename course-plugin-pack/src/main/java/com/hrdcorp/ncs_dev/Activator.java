@@ -29,7 +29,7 @@ public class Activator implements BundleActivator {
         registrationList.add(context.registerService(CourseShedulerQueryReminder.class.getName(), new CourseShedulerQueryReminder(), null));
         registrationList.add(context.registerService(CourseEmailTemplate.class.getName(), new CourseEmailTemplate(), null));
         registrationList.add(context.registerService(CourseSaveEmailTemplateBinder.class.getName(), new CourseSaveEmailTemplateBinder(), null));
-        // registrationList.add(context.registerService(CourseLoadEmailTemplateBinder.class.getName(), new CourseLoadEmailTemplateBinder(), null));
+        registrationList.add(context.registerService(CourseLoadArchiveBinder.class.getName(), new CourseLoadArchiveBinder(), null));
 
     }
 

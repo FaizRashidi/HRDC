@@ -17,8 +17,12 @@ import java.util.regex.Pattern;
 import org.joget.commons.util.LogUtil;
 import org.joget.workflow.util.WorkflowUtil;
 
+
+// Used in CourseEmailTemplate.java
+
 public class EmailTemplate {
 
+    //Get email template from email template setup
     public static Map<String, String> getTemplate (String mail_template, Connection con) throws SQLException{
         LogUtil.info("HRDC - COURSE - Email Template Util ---->","Getting template: " + mail_template);
         String query = "SELECT "
@@ -52,6 +56,7 @@ public class EmailTemplate {
         return result;
     }
 
+    //Get email template from user saved template (user saved template from: course review form > ajax subform (query_email_template). This form (https://ncs-dev.hrdcorp.gov.my/jw/web/console/app/course_registration_module/1/form/builder/course_user_email) has child form with table name of course_user_email)
     public static Map<String, String> getTemplateFromUser (String id, Connection con) throws SQLException{
         LogUtil.info("HRDC - COURSE - Email Template Util ---->","Getting template from user: " + id);
         
@@ -79,7 +84,7 @@ public class EmailTemplate {
         return result;
     }
 
-    public static String buildContent (String app, String id, String msg, Connection con) throws SQLException{
+    public static String buildContent (String app, String nonTemplate, String id, String msg, Connection con) throws SQLException{
         String tableName = "";
 
         LogUtil.info("HRDC - COURSE - Email Template Util ---->","Building string");
@@ -94,6 +99,19 @@ public class EmailTemplate {
             tableName = "app_fd_course_ltm";
         }
 
+        // convert app to process name
+        String[] process = app.split("_");
+
+        StringBuilder converted = new StringBuilder();
+
+        for (String word : process) {
+            // Capitalize the first letter of each word
+            String capitalized = word.substring(0, 1).toUpperCase() + word.substring(1);
+            converted.append(capitalized).append(" ");
+        }
+
+        String processName = converted.toString().trim();
+
         // LogUtil.info("HRDC - COURSE - Email Template Util ---->","tableName: " + tableName);
         // LogUtil.info("HRDC - COURSE - Email Template Util ---->","Email Content: ...");
 
@@ -107,7 +125,11 @@ public class EmailTemplate {
             // Fetch the value from the database for the specific column
 
             String value = "";
-            if(columnName.contains("LINK")){
+            if(nonTemplate == "true" && columnName.contains("c_action_review_status")){
+                value = "Queried";                
+            }else if(nonTemplate == "true" && columnName.contains("c_action_activity")){
+                value = processName+" - Review";
+            }else if(columnName.contains("LINK")){
                 value =  fetchLinkFromDatabase(columnName, tableName,id, con);
             }else if(columnName.contains("c_motto")){
                 value = fetchMottoFromDatabase(columnName, tableName, id, con);
@@ -147,7 +169,7 @@ public class EmailTemplate {
                 // LogUtil.info("HRDC - COURSE - Email Template Util ---->",columnName+": " + value);
             }
         } catch (SQLException e) {
-            LogUtil.error("HRDC - COURSE - Email Template Util ---->",e,"Fail to get column "+columnName+": " + value);
+            LogUtil.info("HRDC - COURSE - Email Template Util ---->","Fail to get column: "+columnName+"; may not exist in table: "+tableName);
             value = "";
             return value;
         }
@@ -190,7 +212,7 @@ public class EmailTemplate {
             }
 
         }catch(Exception ex){
-            LogUtil.error("HRDC - COURSE - Email Template Util ---->",ex,"Fail to Link "+columnName+": ");
+            LogUtil.info("HRDC - COURSE - Email Template Util ---->","Fail to Link "+columnName+": ");
             value = "";
             return value;
         }
@@ -218,7 +240,7 @@ public class EmailTemplate {
                 LogUtil.info("HRDC - COURSE - Email Template Util ---->",columnName+": " + value);
             }
         } catch (SQLException e) {
-            LogUtil.error("HRDC - COURSE - Email Template Util ---->",e,"Fail to get column "+columnName+": " + value);
+            LogUtil.info("HRDC - COURSE - Email Template Util ---->","Fail to get column: "+columnName+"; may not exist in table: "+tableName);
             value = "";
             return value;
         }

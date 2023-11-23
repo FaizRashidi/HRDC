@@ -26,6 +26,9 @@ import com.hrdcorp.ncs_dev.util.AuditTrail;
  *
  * @author farih
  */
+
+// This is used in workflow (workflow tool) to store audit trail after submitting form. ex: https://ncs-dev.hrdcorp.gov.my/jw/web/console/app/course_registration_module/1/process/builder#course_register > tool29: Custom - Save to Audit Trail
+
 public class CourseAuditTrailWorkflowPlugin extends DefaultApplicationPlugin{
     @Override
     public String getName() {
@@ -82,6 +85,7 @@ public class CourseAuditTrailWorkflowPlugin extends DefaultApplicationPlugin{
                         
         try(Connection con = ds.getConnection();) {
 
+            // Call function to store audit trail from util (Only here audit trail is actually saved). Received 4 param, Plugin name, processId, id and connection.
             AuditTrail.addAuditTrail("Audit Trail Workflow Plugin","", processId, id, con);
 
         }catch (Exception ex){

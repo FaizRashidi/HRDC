@@ -333,7 +333,7 @@ iframe.boxy-content{
 
 .form-section, .subform-section, .mpf-container .subform-section {
     border-radius: 10px;
-    border: 1px solid #05050526;
+    /* border: 1px solid #05050526; */
 }
 
 .subform-section.analyzer-disabled{

@@ -28,6 +28,9 @@ import org.joget.commons.util.UuidGenerator;
  *
  * @author Fawad Khaliq <khaliq@opendynamics.com.my>
  */
+
+// This is used in form (store binder) to store audit trail after submitting form. ex: https://ncs-dev.hrdcorp.gov.my/jw/web/console/app/course_registration_module/1/form/builder/cr_review > Settings > Save data to
+
 public class CourseAuditTrailBinder extends WorkflowFormBinder {
 
     public CourseAuditTrailBinder getSuper() {
@@ -39,6 +42,7 @@ public class CourseAuditTrailBinder extends WorkflowFormBinder {
     @Override
     public FormRowSet store(Element element, FormRowSet rows, FormData formData) {
 
+        // store data contained in joget form using default joget store function
         super.store(element, rows, formData);
                 
         try{

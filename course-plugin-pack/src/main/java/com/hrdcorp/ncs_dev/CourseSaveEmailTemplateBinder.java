@@ -22,6 +22,12 @@ import org.joget.commons.util.UuidGenerator;
 
 import com.hrdcorp.ncs_dev.util.EmailTemplate;
 
+// This is used to load email template to a text rich field in a form of https://ncs-dev.hrdcorp.gov.my/jw/web/console/app/course_registration_module/1/form/builder/course_user_email (course_user_email).
+// When selecting email template from (mailTemplate) form: https://ncs-dev.hrdcorp.gov.my/jw/web/console/app/course_registration_module/1/form/builder/cr_review_approver,
+// this will pass template id to course_user_email form. Which this plugin is respondsible to load the template, and populate the template.
+
+// The reason its called CourseSaveEmailTemplateBinder instead of CourseLoadEmailTemplateBinder, is because the main purpose of loading and populate data for the template is to save the email to form course_user_email with table name of app_fd_course_user_email
+
 public class CourseSaveEmailTemplateBinder extends WorkflowFormBinder {
 
     @Override
@@ -76,7 +82,7 @@ public class CourseSaveEmailTemplateBinder extends WorkflowFormBinder {
 
         try(Connection con = ds.getConnection();){
 
-            LogUtil.info("HRDC - COURSE - Save Email Template Binder ---->","rawId = " + id);
+            // LogUtil.info("HRDC - COURSE - Save Email Template Binder ---->","rawId = " + id);
 
             String[] rawValue = id.split("_"); //0-templateid, 1-parent id
 
@@ -124,11 +130,11 @@ public class CourseSaveEmailTemplateBinder extends WorkflowFormBinder {
             }else if(appType.equals("License Training Material")){
                 newAppType = "license_training_material";
             }
-            LogUtil.info("HRDC - COURSE - Save Email Template Binder ---->","appType: "+appType);
-            LogUtil.info("HRDC - COURSE - Save Email Template Binder ---->","newAppType: "+newAppType);
+            // LogUtil.info("HRDC - COURSE - Save Email Template Binder ---->","appType: "+appType);
+            // LogUtil.info("HRDC - COURSE - Save Email Template Binder ---->","newAppType: "+newAppType);
 
-            newSubject = EmailTemplate.buildContent(newAppType, parentId, c_template_subject, con);
-            newContent = EmailTemplate.buildContent(newAppType, parentId, c_template_content, con);
+            newSubject = EmailTemplate.buildContent(newAppType, "true", parentId, c_template_subject, con);
+            newContent = EmailTemplate.buildContent(newAppType, "true", parentId, c_template_content, con);
 
             row.setProperty("id", pId);
             row.setProperty("parentId", parentId);

@@ -25,6 +25,27 @@ import com.hrdcorp.ncs_dev.util.SendEmail;
  *
  * @author farih
  */
+
+// This plugin will notify TP if course is about to expire 
+// it works by selecting course date(x) againts interval(i) unit(u), then send email notification with data based on these courses.
+// x can be:
+//      dateCreated
+//      dateModified
+//      dateApproved
+// i can be:
+//      1
+//      2
+//      3
+// u can be:
+//      Weeks
+//      Months
+//      Years
+
+
+// Need to change query when doing intergration. Instead of query direct from grant, need to check if grant holds that course id.
+// In other words, in select statement, we only select course that is not registered in grant.
+
+
 public class CourseSchedulerNotifyCourseExpirePlugini extends DefaultApplicationPlugin {
     @Override
     public String getName() {
@@ -73,7 +94,7 @@ public class CourseSchedulerNotifyCourseExpirePlugini extends DefaultApplication
             Connection con = ds.getConnection();
             try {
                 LogUtil.info("HRDC - COURSE - Scheduler Notify Course Expire ---->","Connection sucess, try updating");
-                                    
+
                 String sql = "SELECT \n" +
                             "	cr.*, \n" +
                             "   du.username, \n" +

@@ -31,6 +31,9 @@ import org.joget.workflow.model.service.WorkflowManager;
 import com.hrdcorp.ncs_dev.util.EmailTemplate;
 import com.hrdcorp.ncs_dev.util.SendEmail;
 
+// This is used in workflow (workflow tool) to send email after submitting form. ex: https://ncs-dev.hrdcorp.gov.my/jw/web/console/app/course_registration_module/1/process/builder#course_register > tool2: Email - Notification (Course Submitted)
+// This is used to map email template to the activitiy in the process.
+
 public class CourseEmailTemplate extends DefaultApplicationPlugin{
     
     @Override
@@ -145,9 +148,9 @@ public class CourseEmailTemplate extends DefaultApplicationPlugin{
 
                 receiver += sendTo;
 
-                newSubject = EmailTemplate.buildContent(app_type, id, subject, con);
+                newSubject = EmailTemplate.buildContent(app_type, "", id, subject, con);
 
-                newMsg = EmailTemplate.emailContentHeader(newSubject) + EmailTemplate.buildContent(app_type, id, msg, con) + EmailTemplate.emailContentFooter();
+                newMsg = EmailTemplate.emailContentHeader(newSubject) + EmailTemplate.buildContent(app_type, "", id, msg, con) + EmailTemplate.emailContentFooter();
 
             }else{
                 LogUtil.info("HRDC - COURSE - Email Template Mapper Plugin ---->","Template email: " + id);
@@ -159,9 +162,9 @@ public class CourseEmailTemplate extends DefaultApplicationPlugin{
                 }
                 msg = template.get("c_template_content");
 
-                newSubject = EmailTemplate.buildContent(app_type, id, subject, con);
+                newSubject = EmailTemplate.buildContent(app_type, "", id, subject, con);
 
-                newMsg = EmailTemplate.emailContentHeader(newSubject) + EmailTemplate.buildContent(app_type, id, msg, con) + EmailTemplate.emailContentFooter();
+                newMsg = EmailTemplate.emailContentHeader(newSubject) + EmailTemplate.buildContent(app_type, "", id, msg, con) + EmailTemplate.emailContentFooter();
             }
             
             // LogUtil.info("HRDC - COURSE - Email Template Mapper Plugin ---->","Receiver: " + receiver);
