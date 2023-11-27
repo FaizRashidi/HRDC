@@ -4,6 +4,8 @@ import com.hrdcorp.ncs_dev.shceduler.CourseSchedulerNotifyCourseExpirePlugini;
 import com.hrdcorp.ncs_dev.shceduler.CourseSchedulerUpdateActiveInactivePlugin;
 import com.hrdcorp.ncs_dev.shceduler.CourseShedulerQueryReminder;
 import com.hrdcorp.ncs_dev.webservice.CourseApi;
+import com.hrdcorp.ncs_dev.binder.CourseLoadAmendHistory;
+import com.hrdcorp.ncs_dev.defaultPlugin.CourseRestoreAmendData;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,6 +32,9 @@ public class Activator implements BundleActivator {
         registrationList.add(context.registerService(CourseEmailTemplate.class.getName(), new CourseEmailTemplate(), null));
         registrationList.add(context.registerService(CourseSaveEmailTemplateBinder.class.getName(), new CourseSaveEmailTemplateBinder(), null));
         registrationList.add(context.registerService(CourseLoadArchiveBinder.class.getName(), new CourseLoadArchiveBinder(), null));
+        registrationList.add(context.registerService(CourseLoadAmendHistory.class.getName(), new CourseLoadAmendHistory(), null));
+        registrationList.add(context.registerService(CourseRestoreAmendData.class.getName(), new CourseRestoreAmendData(), null));
+
 
     }
 

@@ -107,7 +107,7 @@ public class CourseLoadArchiveBinder  extends WorkflowFormBinder {
 
             String query = "SELECT * FROM app_fd_course_register WHERE id=?";
 
-            String sql = "SELECT * FROM archive.course_registration WHERE TRAINING_PROGRAMME_MASTER_ID = ?";
+            String sql = "SELECT TRAINING_PROGRAMME_MASTER_ID FROM archive.course_registration WHERE CAST(TRAINING_PROGRAMME_MASTER_ID AS char) = ?";
             PreparedStatement statement = con.prepareStatement(sql);
             statement.setString(1, id);
             ResultSet resultSet = statement.executeQuery();
@@ -126,6 +126,9 @@ public class CourseLoadArchiveBinder  extends WorkflowFormBinder {
             if(rs.next()) {
 
                 if (exists){
+
+                    LogUtil.info("HRDC - COURSE - Load Archive Course ---->","Exist?: " + exists);
+
                     c_title = rs.getString("COURSE_TITLE");
                     c_skill_area = rs.getString("SKILL_AREA");
                     c_scheme_name = rs.getString("SCHEME_NAME");
