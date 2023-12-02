@@ -1,0 +1,39 @@
+[{
+    title : 'Email Blasting Mapper Tool',
+    properties : [{
+        name:'blast_type',
+        label: 'Email Blastting for',
+        type:'selectbox',
+        required : 'true',
+        value : 'potential_participant',
+        options : [
+            {value: 'potential_participant', label : 'Potential Participant'},
+            {value: 'invite_registred_participant', label : 'Invite Registered Participant'}
+        ]
+    },{
+        name:'mail_template',
+        label: 'Email Template',
+        type:'selectbox',
+        options_ajax : '[CONTEXT_PATH]/web/json/app[APP_PATH]/plugin/com.hrdcorp.ncs_dev.webservice.EventApi/service?method=GETTEMPLATE',
+        required : 'true',
+        control_field: 'blast_type',
+        control_value: 'invite_registred_participant',
+        control_use_regex: 'true'
+    },{
+        name:'app_type',
+        label: 'App Type',
+        type:'radio',
+        required : 'true',
+        control_field: 'blast_type',
+        control_value: 'invite_registred_participant',
+        control_use_regex: 'true',
+        value : 'event_creation',
+        options : [
+            {value: 'event_creation', label : 'Event Creation'},
+            {value: 'event_registration', label : 'Event Registration'},
+            {value: 'event_officer_modifying', label : 'Officer Modifying'},
+            {value: 'event_participant_withdrawing', label : 'Participant Withdrawing'},
+            {value: 'event_participant_modifying', label : 'Participant Modifying'}
+        ]
+    }]
+}]

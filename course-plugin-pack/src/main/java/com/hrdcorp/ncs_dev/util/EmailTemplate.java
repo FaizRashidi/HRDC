@@ -330,7 +330,7 @@ public class EmailTemplate {
     public static String emailContentFooter(){
         String footer = "";
 
-        footer = "<div class=\"footer\">\r\n" +
+        footer = "</div><div class=\"footer\">\r\n" +
                 "        <p style=\"text-align: center; margin-bottom:20px\">&copy; 2023 HRD Corporation</p>\r\n" +
                 "    </div>\r\n" +
                 "</body>";

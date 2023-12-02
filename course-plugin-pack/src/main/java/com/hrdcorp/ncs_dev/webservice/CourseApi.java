@@ -4,12 +4,21 @@
  */
 package com.hrdcorp.ncs_dev.webservice;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -85,6 +94,9 @@ public class CourseApi extends DefaultPlugin implements PluginWebSupport{
                     break;
                 case "GETLINKSNAME":
                     getLinksName(request, response, con);
+                    break;
+                case "GETCOURSEDETAILSFORTM":
+                    getcoursedetailsfortm(request, response, con);
                     break;
                 default:
                     response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, "Parameter method with invalid option " + method);
@@ -274,6 +286,63 @@ public class CourseApi extends DefaultPlugin implements PluginWebSupport{
             
         }finally{
             con.close();
+        }
+    }
+
+
+    private void getcoursedetailsfortm(HttpServletRequest request, HttpServletResponse response, Connection con) {
+
+        LocalDate startDate = LocalDate.parse(request.getParameter("startDate"), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        LocalDate endDate = LocalDate.parse(request.getParameter("endDate"), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+        String sql = "SELECT * FROM app_fd_course_register WHERE c_date_approved BETWEEN ? AND ? AND c_active_inactive_status = 'Active'";
+
+        try (PrintWriter out = response.getWriter()) {
+            PreparedStatement stmt = con.prepareStatement(sql);
+            stmt.setDate(1, Date.valueOf(startDate));
+            stmt.setDate(2, Date.valueOf(endDate));
+            ResultSet rs = stmt.executeQuery();
+            JSONArray array = new JSONArray();
+            int Count = 0;
+            while (rs.next()) {
+                JSONObject data = new JSONObject();
+                String id = rs.getString("id");
+                String course_id = rs.getString("c_course_id");
+                String course_name = rs.getString("c_course_name");
+                String course_type = rs.getString("c_cr_type");
+                String dateCreated = rs.getString("dateCreated");
+                String dateApproved = rs.getString("c_date_approved");
+                String activeInactiveStatus = rs.getString("c_active_inactive_status");
+                String status = rs.getString("c_status");
+
+                data.put("id", id);
+                data.put("course_id", course_id);
+                data.put("course_name", course_name);
+                data.put("course_type", course_type);
+                data.put("dateCreated", dateCreated);
+                data.put("dateApproved", dateApproved);
+                data.put("activeInactiveStatus", activeInactiveStatus);
+                data.put("status", status);
+                array.put(data);
+                Count = Count +1;
+            }
+            JSONObject count = new JSONObject();
+            count.put("Count", Count);
+            array.put(count);
+
+            out.print(array);
+
+        } catch (Exception e) {
+            LogUtil.error(this.getClass().getName(), e, "Something went wrong:");
+
+        } finally {
+            try {
+                if (con != null && !con.isClosed()) {
+                    con.close();
+                }
+            } catch (SQLException ex) {
+                LogUtil.error(this.getClass().getName(), ex, "Cannot close connection");
+            }
         }
     }
 

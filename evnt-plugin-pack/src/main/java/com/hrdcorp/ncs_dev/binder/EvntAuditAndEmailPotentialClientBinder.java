@@ -3,8 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.hrdcorp.ncs_dev;
+package com.hrdcorp.ncs_dev.binder;
 
+import java.io.IOException;
+import java.nio.file.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,9 +29,13 @@ import org.joget.apps.form.model.FormRow;
 import org.joget.apps.form.model.FormRowSet;
 import org.joget.apps.form.service.FormUtil;
 import org.joget.commons.util.LogUtil;
+import org.joget.commons.util.SetupManager;
 import org.joget.commons.util.UuidGenerator;
 import org.joget.plugin.property.service.PropertyUtil;
 import org.springframework.beans.BeansException;
+
+
+import com.hrdcorp.ncs_dev.util.SendEmail;
 
 /**
  *
@@ -70,13 +76,15 @@ public class EvntAuditAndEmailPotentialClientBinder extends WorkflowFormBinder {
                 
                 String querySubject = row.getProperty("action_query_subject")!= null ?  row.getProperty("action_query_subject") : "";
                 String queryAddEmail = row.getProperty("action_additional_email")!= null ? row.getProperty("action_additional_email") : "";
-                String queryReason = row.getProperty("action_query_reason")!= null ? row.getProperty("action_additional_email") : "";
+
+                String queryReason = row.getProperty("action_query_reason")!= null ? row.getProperty("action_query_reason") : "";
                 String remarks = row.getProperty("action_remarks") != null ? row.getProperty("action_remarks") : ""; 
                 String action_status = row.getProperty("status");
+                String action_attachment = row.getProperty("action_attachment");
                 String action_review_status = row.getProperty("action_review_status");
                 
-                String insertSql = "INSERT INTO app_fd_evnt_auditTrail (dateCreated,dateModified,c_action_date,id,createdBy,createdByName,modifiedBy,modifiedByName,c_action_workflow,c_action_activity,c_parentId,c_action_name,c_action_department,c_action_query_subject,c_action_additional_email,c_action_query_reason,c_action_remarks,c_status,c_action_review_status)"
-                        + "VALUES (NOW(),NOW(),NOW(),?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+                String insertSql = "INSERT INTO app_fd_evnt_auditTrail (dateCreated,dateModified,c_action_date,id,createdBy,createdByName,modifiedBy,modifiedByName,c_action_workflow,c_action_activity,c_parentId,c_action_name,c_action_department,c_action_query_subject,c_action_additional_email,c_action_query_reason,c_action_remarks,c_status,c_action_attachment,c_action_review_status)"
+                        + "VALUES (NOW(),NOW(),NOW(),?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
                  
                 PreparedStatement stmtInsert = con.prepareStatement(insertSql);
                 
@@ -95,10 +103,56 @@ public class EvntAuditAndEmailPotentialClientBinder extends WorkflowFormBinder {
                 stmtInsert.setString(13, queryReason);
                 stmtInsert.setString(14, remarks);
                 stmtInsert.setString(15, action_status);
-                stmtInsert.setString(16, action_review_status);
+                stmtInsert.setString(16, action_attachment);
+                stmtInsert.setString(17, action_review_status);
                 
                 //Execute SQL statement
-                stmtInsert.executeUpdate();
+                try{
+                    String workflow_path = null;
+                    if (workflowName.endsWith("Event Creation") || workflowName.endsWith("Officer Modifying")){
+                        workflow_path = "event";
+                    }else if(workflowName.endsWith("Event Registration") || workflowName.endsWith("Participant Withdrawing") || workflowName.endsWith("Participant Modifying")){
+                        workflow_path = "event_registration";
+                    }
+                    
+                    String path = SetupManager.getBaseDirectory() + "app_formuploads/"+workflow_path+"/" + parentId+"/";
+                    String newPath = SetupManager.getBaseDirectory() + "app_formuploads/evnt_auditTrail/" +pId+"/";
+                    
+                    LogUtil.info("Event Audit Trail ---->","Checking if path exist: " + path);                    
+                    
+                    Path sourcePath = Paths.get(path, action_attachment);
+                    Path destinationPath = Paths.get(newPath, action_attachment);
+                    
+                    
+                    if (Files.exists(sourcePath)) {
+                        LogUtil.info("Event Audit Trail ---->","Source path exist:" + path);      
+                        if (!Files.exists(destinationPath.getParent())) {
+                            LogUtil.info("Event Audit Trail ---->","Destination path not exist, Creating Folder"+ destinationPath);
+                            
+                            Files.createDirectories(destinationPath.getParent());
+                        }
+                                                
+                        try {
+                            LogUtil.info("Event Audit Trail ---->","Copying File");
+                            Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+                            LogUtil.info("Event Audit Trail ---->","Copy Successful");
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            LogUtil.info("Event Audit Trail ---->","Error copy");
+                        }
+                    }else{
+                        LogUtil.info("Event Audit Trail ---->","Source path doesn't exist:" + path); 
+                        if (!Files.exists(destinationPath.getParent())) {
+                            LogUtil.info("Event Audit Trail ---->","Path not exist, Creating Folder"+ destinationPath);
+                            
+                            Files.createDirectories(destinationPath.getParent());
+                        }
+                    }
+                    
+                    stmtInsert.executeUpdate();
+                }catch (Exception ex){
+                    
+                }
             }
             
         }catch(Exception ex){
@@ -271,8 +325,7 @@ public class EvntAuditAndEmailPotentialClientBinder extends WorkflowFormBinder {
                                 "    </div>\n" +
                                 "</body>";
                             try{
-                                LogUtil.info("HRDC EVENT Email Potential Participant ---->","Trying to send email to: "+"("+user_name+") - "+user_email);
-                                sendEmail(user_email, "", subject, msg);
+                                SendEmail.sendEmail("HRDC EVENT Email Potential Participant", user_email, "", subject, msg);
                             }catch(Exception ex){
                                 LogUtil.info("HRDC EVENT Email Potential Participant ---->","Fail trying to send email to: "+"("+user_name+") - "+user_email);
                             }
@@ -290,7 +343,7 @@ public class EvntAuditAndEmailPotentialClientBinder extends WorkflowFormBinder {
                 try {
                     con.close();
                 } catch (SQLException ex) {
-                    Logger.getLogger(EvntEmailPotentialClient.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(EvntAuditAndEmailPotentialClientBinder.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
             
@@ -302,39 +355,13 @@ public class EvntAuditAndEmailPotentialClientBinder extends WorkflowFormBinder {
             try {
                 con.close();
             } catch (SQLException ex) {
-                Logger.getLogger(EvntEmailPotentialClient.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(EvntAuditAndEmailPotentialClientBinder.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         
         return rows;
     }
     
-    public static void sendEmail(String user_email, String bcc, String subject, String msg) {  
-        
-        LogUtil.info("HRDC EVENT Email Potential Participant ---->","Actually Sending Email to: " +user_email);
-        
-        try{
-            EmailTool et = new EmailTool();
-
-            PluginDefaultPropertiesDao dao = (PluginDefaultPropertiesDao) AppUtil.getApplicationContext().getBean("pluginDefaultPropertiesDao");
-            PluginDefaultProperties pluginDefaultProperties = dao.loadById("org.joget.apps.app.lib.EmailTool", AppUtil.getCurrentAppDefinition());
-            Map properties = PropertyUtil.getPropertiesValueFromJson(pluginDefaultProperties.getPluginProperties());
-
-            properties.put("from", "no-reply@your-company-name.com");
-            properties.put("toSpecific", user_email);
-            properties.put("bcc", "bcc");
-            properties.put("subject", subject);
-            properties.put("message", msg);
-            properties.put("isHtml", "true");
-
-            et.execute(properties);
-        }catch(Exception ex){
-            LogUtil.error("HRDC EVENT Email Potential Participant ---->", ex, "Error sending email");
-        }
-        
-        LogUtil.info("HRDC EVENT Email Potential Participant ","email successfully sent to participant" + user_email);      
-    }
-
     // Method to format date as per the required database format
     private String formatDate(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

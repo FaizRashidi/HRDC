@@ -23,7 +23,7 @@ import org.joget.plugin.base.PluginProperty;
 import org.joget.plugin.base.PluginWebSupport;
 import org.joget.workflow.util.WorkflowUtil;
 
-/**
+ /**
  *
  * @author farih
  */
@@ -166,7 +166,7 @@ public class HrdcThemeWebService  extends DefaultPlugin implements PluginWebSupp
                 obj.put("id", id);
                 obj.put("parent_id", rs.getString("c_parentId"));
                 obj.put("image", image);
-                obj.put("url", BASE_URL + "/jw/web/client/app/appcenter/1/form/download/login_carousel/"+id+"/"+image+".?__a_=appcenter&__u_=home");
+                obj.put("url", BASE_URL + "/jw/web/client/app/appcenter/2/form/download/login_carousel/"+id+"/"+image+".?__a_=appcenter&__u_=home");
                 obj.put("duration", duration);
                 array.put(obj);
             }

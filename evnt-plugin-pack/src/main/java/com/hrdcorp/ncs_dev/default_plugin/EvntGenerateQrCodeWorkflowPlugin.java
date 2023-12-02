@@ -1,5 +1,5 @@
 
-package com.hrdcorp.ncs_dev;
+package com.hrdcorp.ncs_dev.default_plugin;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -24,13 +24,15 @@ import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
-import static com.hrdcorp.ncs_dev.EvntAuditAndEmailPotentialClientBinder.sendEmail;
 import org.joget.apps.app.dao.PluginDefaultPropertiesDao;
 import org.joget.apps.app.lib.EmailTool;
 import org.joget.apps.app.model.PluginDefaultProperties;
 import org.joget.commons.util.SetupManager;
 import org.joget.apps.app.service.AppUtil;
 import org.joget.plugin.property.service.PropertyUtil;
+
+import com.hrdcorp.ncs_dev.util.SendEmail;
+
 
 
 public class EvntGenerateQrCodeWorkflowPlugin extends DefaultApplicationPlugin {
@@ -86,7 +88,7 @@ public class EvntGenerateQrCodeWorkflowPlugin extends DefaultApplicationPlugin {
                         
         try {
             con = ds.getConnection();
-            String sql = "SELECT  u.* FROM  app_fd_event_reg_user u JOIN app_fd_event_registration r ON u.c_parentId = r.id WHERE r.id = ?;" ;
+            String sql = "SELECT  u.* FROM  app_fd_event_reg_user u LEFT JOIN app_fd_event_registration r ON u.c_parentId = r.id WHERE r.id = ?;" ;
             
             PreparedStatement stmt = con.prepareStatement(sql);
             stmt.setString(1, recordid);
@@ -273,7 +275,7 @@ public class EvntGenerateQrCodeWorkflowPlugin extends DefaultApplicationPlugin {
                                 "</body>";
                     try{
                         LogUtil.info("HRDC EVENT Genrate QR Code ---->","Trying to send email to: "+"("+user_name+") - "+user_email);
-                        sendEmail(user_email, "", subject, msg);
+                        SendEmail.sendEmail("",user_email, "", subject, msg);
                     }catch(Exception ex){
                         LogUtil.info("HRDC EVENT Genrate QR Code ---->","Fail trying to send email to: "+"("+user_name+") - "+user_email);
                     }
@@ -308,30 +310,4 @@ public class EvntGenerateQrCodeWorkflowPlugin extends DefaultApplicationPlugin {
         LogUtil.info("HRDC EVENT Genrate QR Code ---->","CreateQr - data = " + data);
         LogUtil.info("HRDC EVENT Genrate QR Code ---->","CreateQr - Path = " + path);
     }  
-    
-    public static void sendEmail(String user_email, String bcc, String subject, String msg) {  
-        
-        LogUtil.info("HRDC EVENT Genrate QR Code ---->","Actually Sending Email to: " +user_email);
-        
-        try{
-            EmailTool et = new EmailTool();
-
-            PluginDefaultPropertiesDao dao = (PluginDefaultPropertiesDao) AppUtil.getApplicationContext().getBean("pluginDefaultPropertiesDao");
-            PluginDefaultProperties pluginDefaultProperties = dao.loadById("org.joget.apps.app.lib.EmailTool", AppUtil.getCurrentAppDefinition());
-            Map properties = PropertyUtil.getPropertiesValueFromJson(pluginDefaultProperties.getPluginProperties());
-
-            properties.put("from", "no-reply@your-company-name.com");
-            properties.put("toSpecific", user_email);
-            properties.put("bcc", "bcc");
-            properties.put("subject", subject);
-            properties.put("message", msg);
-            properties.put("isHtml", "true");
-
-            et.execute(properties);
-        }catch(Exception ex){
-            LogUtil.error("HRDC EVENT Genrate QR Code ---->", ex, "Error sending email");
-        }
-        
-        LogUtil.info("HRDC EVENT Genrate QR Code ---->","email successfully sent to participant" + user_email);      
-    }
 }

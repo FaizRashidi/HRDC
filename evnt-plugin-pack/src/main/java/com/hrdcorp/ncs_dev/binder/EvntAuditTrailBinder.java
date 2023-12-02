@@ -3,8 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.hrdcorp.ncs_dev;
+package com.hrdcorp.ncs_dev.binder;
 
+import java.io.IOException;
+import java.nio.file.*;
+import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.text.SimpleDateFormat;
@@ -19,6 +22,7 @@ import org.joget.apps.form.model.FormRow;
 import org.joget.apps.form.model.FormRowSet;
 import org.joget.apps.form.service.FormUtil;
 import org.joget.commons.util.LogUtil;
+import org.joget.commons.util.SetupManager;
 import org.joget.commons.util.UuidGenerator;
 
 /**
@@ -59,13 +63,15 @@ public class EvntAuditTrailBinder extends WorkflowFormBinder {
                 
                 String querySubject = row.getProperty("action_query_subject")!= null ?  row.getProperty("action_query_subject") : "";
                 String queryAddEmail = row.getProperty("action_additional_email")!= null ? row.getProperty("action_additional_email") : "";
+
                 String queryReason = row.getProperty("action_query_reason")!= null ? row.getProperty("action_query_reason") : "";
                 String remarks = row.getProperty("action_remarks") != null ? row.getProperty("action_remarks") : ""; 
                 String action_status = row.getProperty("status");
+                String action_attachment = row.getProperty("action_attachment");
                 String action_review_status = row.getProperty("action_review_status");
                 
-                String insertSql = "INSERT INTO app_fd_evnt_auditTrail (dateCreated,dateModified,c_action_date,id,createdBy,createdByName,modifiedBy,modifiedByName,c_action_workflow,c_action_activity,c_parentId,c_action_name,c_action_department,c_action_query_subject,c_action_additional_email,c_action_query_reason,c_action_remarks,c_status,c_action_review_status)"
-                        + "VALUES (NOW(),NOW(),NOW(),?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+                String insertSql = "INSERT INTO app_fd_evnt_auditTrail (dateCreated,dateModified,c_action_date,id,createdBy,createdByName,modifiedBy,modifiedByName,c_action_workflow,c_action_activity,c_parentId,c_action_name,c_action_department,c_action_query_subject,c_action_additional_email,c_action_query_reason,c_action_remarks,c_status,c_action_attachment,c_action_review_status)"
+                        + "VALUES (NOW(),NOW(),NOW(),?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
                  
                 PreparedStatement stmtInsert = con.prepareStatement(insertSql);
                 
@@ -84,10 +90,56 @@ public class EvntAuditTrailBinder extends WorkflowFormBinder {
                 stmtInsert.setString(13, queryReason);
                 stmtInsert.setString(14, remarks);
                 stmtInsert.setString(15, action_status);
-                stmtInsert.setString(16, action_review_status);
+                stmtInsert.setString(16, action_attachment);
+                stmtInsert.setString(17, action_review_status);
                 
                 //Execute SQL statement
-                stmtInsert.executeUpdate();
+                try{
+                    String workflow_path = null;
+                    if (workflowName.endsWith("Event Creation") || workflowName.endsWith("Officer Modifying")){
+                        workflow_path = "event";
+                    }else if(workflowName.endsWith("Event Registration") || workflowName.endsWith("Participant Withdrawing") || workflowName.endsWith("Participant Modifying")){
+                        workflow_path = "event_registration";
+                    }
+                    
+                    String path = SetupManager.getBaseDirectory() + "app_formuploads/"+workflow_path+"/" + parentId+"/";
+                    String newPath = SetupManager.getBaseDirectory() + "app_formuploads/evnt_auditTrail/" +pId+"/";
+                    
+                    LogUtil.info("Event Audit Trail ---->","Checking if path exist: " + path);                    
+                    
+                    Path sourcePath = Paths.get(path, action_attachment);
+                    Path destinationPath = Paths.get(newPath, action_attachment);
+                    
+                    
+                    if (Files.exists(sourcePath)) {
+                        LogUtil.info("Event Audit Trail ---->","Source path exist:" + path);      
+                        if (!Files.exists(destinationPath.getParent())) {
+                            LogUtil.info("Event Audit Trail ---->","Destination path not exist, Creating Folder"+ destinationPath);
+                            
+                            Files.createDirectories(destinationPath.getParent());
+                        }
+                                                
+                        try {
+                            LogUtil.info("Event Audit Trail ---->","Copying File");
+                            Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+                            LogUtil.info("Event Audit Trail ---->","Copy Successful");
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            LogUtil.info("Event Audit Trail ---->","Error copy");
+                        }
+                    }else{
+                        LogUtil.info("Event Audit Trail ---->","Source path doesn't exist:" + path); 
+                        if (!Files.exists(destinationPath.getParent())) {
+                            LogUtil.info("Event Audit Trail ---->","Path not exist, Creating Folder"+ destinationPath);
+                            
+                            Files.createDirectories(destinationPath.getParent());
+                        }
+                    }
+                    
+                    stmtInsert.executeUpdate();
+                }catch (Exception ex){
+                    LogUtil.error("Event Audit Trail", ex, "Error storing using jdbc");
+                }
             }
             
         }catch(Exception ex){

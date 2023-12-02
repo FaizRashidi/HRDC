@@ -72,12 +72,21 @@ public class CourseSchedulerUpdateActiveInactivePlugin extends DefaultApplicatio
         }catch(SQLException e) {
             e.printStackTrace();
         }
-
         return null;
     }
     
          
     public void updateInactiveDataAfterYear(Connection con) throws SQLException {
+
+        // Farah suruh tulis note:
+
+        // Kena tambah function untuk call API dari grant.
+
+        // Mula2 select id from app_fd_course_register where ...
+        // loop result reslt.next(), dalam loop buat api call ke grant based on id
+
+        // Api grant akan return true atau false. Kalau true, update status inactive: update c_active_inactive_status = 'inactive' where id = id yang kita loop.
+
       Statement stmt = null;
         
       stmt = con.createStatement();
